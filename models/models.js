@@ -23,12 +23,11 @@ const Post = sequelize.define('Post', {
     userId: {type: DataTypes.INTEGER,references: {model: User,  key: 'id'}}
   });
 
-User.hasMany(Post, { foreignKey: 'userId' });
-Post.belongsTo(User, { foreignKey: 'userId' });
+User.hasOne(UserInfo, {foreignKey: 'userId', onDelete: 'CASCADE' })
+UserInfo.belongsTo(User, {foreignKey: 'userId',});
 
-User.hasOne(UserInfo, { foreignKey: 'userId' });
-UserInfo.belongsTo(User);
-
+User.hasMany(Post, {foreignKey: 'userId', onDelete: 'CASCADE'})
+Post.belongsTo(User, {foreignKey: 'userId',});
 
 
 module.exports={
