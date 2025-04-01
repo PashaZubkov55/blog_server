@@ -1,10 +1,13 @@
 class PostController{
-async getAll(){
+async getAll(req, res){
+    
 
 }
 
-async create (){
-
+async create (req, res){
+    const {title, description, userId} = req.body
+    const {img} = req.files
+    
 }
 async getPost(){
 
