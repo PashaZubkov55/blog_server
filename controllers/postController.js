@@ -2,7 +2,7 @@ const uuid = require('uuid')
 const path = require('path') 
 const {Post} = require('../models/models')
 const ApiError = require('../errors/apiError')
-const { where } = require('sequelize')
+
 
 
 
@@ -31,13 +31,13 @@ async create (req, res, next){
     }
    
 }
-async getPost(){
-
+async getOne(req, res){
+   const {id} = req.params
+   const post = await Post.findOne({where:{id}})
+   return res.json(post)
 }
-async del(req, res, next){
-    let {id} = req.query()
-    const post = await Post.findAll({where:{id}})
-    return res.json(post)
+async del(){
+   
 
 }
 

@@ -6,8 +6,8 @@
 
  const router = new Router()
 
-router.use('/users',userRouter)
-router.use('/posts', postRouter)
+router.use('/user',userRouter)
+router.use('/post', postRouter)
 router.use('/userInfo',userInfoRoute)
 
 
