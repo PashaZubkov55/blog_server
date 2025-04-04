@@ -7,7 +7,8 @@ const ApiError = require('../errors/apiError')
 
 class PostController{
 async getAll(req, res){
-    
+    const posts = await Post.findAll()
+    return res.json(posts)
 
 }
 
