@@ -32,15 +32,25 @@ async create (req, res, next){
    
 }
 async getOne(req, res){
-   const {id} = req.params
-   const post = await Post.findOne({where:{id}})
-   return res.json(post)
+    try{
+        const {id} = req.params
+        const post = await Post.findOne({where:{id}})
+        return res.json(post)
+    } catch(err){
+        next(ApiError.badRequest(err.message))
+    }
+ 
 }
 async del(req, res){
-   const {id} = req.params
-   const post = await Post.destroy({where:{id}})
-   return res.json(post)
+    try{
+        const {id} = req.params
+        const post = await Post.destroy({where:{id}})
+        return res.json(post)
 
+    } catch(err){
+        next(ApiError.badRequest(err.message))
+    }
+   
 }
 
 }
