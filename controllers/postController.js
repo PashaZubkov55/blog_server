@@ -2,14 +2,18 @@ const uuid = require('uuid')
 const path = require('path') 
 const {Post} = require('../models/models')
 const ApiError = require('../errors/apiError')
+const { where } = require('sequelize')
 
 
 
 class PostController{
-async getAll(req, res){
+async getAll(req, res, next){
+    try{
     const posts = await Post.findAll()
     return res.json(posts)
-
+    }catch(err){
+        next(ApiError.badRequest(err.message))
+    }
 }
 
 async create (req, res, next){
@@ -19,9 +23,9 @@ async create (req, res, next){
         let fileName = uuid.v4() +'.jpg'
         img.mv(path.resolve(__dirname, '..', 'static', fileName))
     
-        const post = await Post.create({title, description, userId, img: fileName})
+        const posts = await Post.create({title, description, userId, img: fileName})
 
-        return res.json(post)
+        return res.json(posts)
     } catch(err){
         next(ApiError.badRequest(err.message))
     }
@@ -30,7 +34,10 @@ async create (req, res, next){
 async getPost(){
 
 }
-async del(){
+async del(req, res, next){
+    let {id} = req.query()
+    const post = await Post.findAll({where:{id}})
+    return res.json(post)
 
 }
 
