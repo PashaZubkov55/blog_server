@@ -5,7 +5,7 @@ const User = sequelize.define('User',{
     id:{type: DataTypes.INTEGER, primaryKey:true, autoIncrement:true},
     email:{type: DataTypes.STRING, unique: true},
     password:{type: DataTypes.STRING},
-    role:{type: DataTypes.STRING, defaultValue: 'GUEST'},
+    role:{type: DataTypes.STRING, defaultValue: 'ADMIN'},
 
 })
 const UserInfo = sequelize.define('UserInfo',{
