@@ -26,7 +26,18 @@ class UserController{
         const token = genirateJWT(user.id, user.email, user.role)
         return res.json({token})
     }
-    async login(){
+    async login(req, res, next){
+        const {email, password} = req.body
+        const user = await User.findOne({where: {email}})
+        if (!user) {
+            return next(ApiError.badRequest('Пользователь не найден'))
+        }
+        let compairePassword = bcrypt.compareSync(password, user.password)
+        if (!compairePassword) {
+            return next(ApiError.badRequest('Пароль не верный ! '))
+        }
+            const token = genirateJWT(user.id, user.email, user.role)
+            return res.json({token})
 
     }
     async check (){
