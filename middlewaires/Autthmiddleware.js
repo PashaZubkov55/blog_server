@@ -5,7 +5,7 @@ module.exports = function (req, res, next) {
     
  }
  try {
-    const token = req.headers.autorization.splin(' ')[1]
+    const token = req.headers.autorization.split(' ')[1]
     if (!token) {
         return res.status(401).json({massage: 'Не авторизован !'})
     }
