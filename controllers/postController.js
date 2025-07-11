@@ -52,6 +52,23 @@ async del(req, res){
     }
    
 }
-
+async update(req,res){
+    try {
+        const {id} = req.params
+        const {title, description, userId} = req.body
+        const {img} = req.files
+        let fileName = uuid.v4() +'.jpg'
+        img.mv(path.resolve(__dirname, '..', 'static', fileName))
+    const post = Post.update({title, description, userId, img: fileName},{
+        where:{id}
+    })
+        return res.json(post)
+    } catch(err){
+        next(ApiError.badRequest(err.message))
+        
+    }
+    
 }
+}
+   
 module.exports = new PostController()

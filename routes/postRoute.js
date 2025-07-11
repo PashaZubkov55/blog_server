@@ -6,6 +6,7 @@ const Router = require('express')
  router.get('/:id', postController.getOne)
  router.post('/',postController.create)
  router.get('/:UserId')
+ router.put('/:id',postController.update)
  router.delete('/:id', postController.del)
 
 
