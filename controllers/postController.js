@@ -6,6 +6,7 @@ const ApiError = require('../errors/apiError')
 
 
 
+
 class PostController{
 async getAll(req, res, next){
     try{
@@ -31,7 +32,7 @@ async create (req, res, next){
     }
    
 }
-async getOne(req, res){
+async getOne(req, res, next){
     try{
         const {id} = req.params
         const post = await Post.findOne({where:{id}})
@@ -41,7 +42,7 @@ async getOne(req, res){
     }
  
 }
-async del(req, res){
+async del(req, res, next){
     try{
         const {id} = req.params
         const post = await Post.destroy({where:{id}})
@@ -52,21 +53,37 @@ async del(req, res){
     }
    
 }
-async update(req,res){
-    try {
-        const {id} = req.params
-        const {title, description, userId} = req.body
-        const {img} = req.files
-        let fileName = uuid.v4() +'.jpg'
-        img.mv(path.resolve(__dirname, '..', 'static', fileName))
-    const post = Post.update({title, description, userId, img: fileName},{
-        where:{id}
-    })
-        return res.json(post)
-    } catch(err){
-        next(ApiError.badRequest(err.message))
-        
-    }
+
+    async update(req, res) {
+        try {
+            const { id } = req.params;
+            const { title, description, userId } = req.body;
+            const {img} = req.files
+            console.log(img)
+            let fileName =  uuid.v4() +'.jpg'
+            img.mv(path.resolve(__dirname, '..', 'static', fileName))
+
+          //let fileImg=  req.files.img|| {}
+           // let files = req.files || {}; // Получаем файлы, либо пустой объект, если их нет
+            //let imgFile = files.img && Array.isArray(files.img) ? files.img[0] : null; // Берём первый файл, если есть
+           // console.log(fileImg)
+            if (!img) throw new Error('Файл изображения не передан.');
+    
+            
+            //console.log(fileImg)
+            await img.mv(path.resolve(__dirname, '..', 'static',fileName )); // Сохраняем файл по правильному пути
+    
+
+            const updatedPost = await Post.update(
+                { title, description, userId, img: fileName },
+                { where: { id } }
+            );
+    
+            return res.json(updatedPost);
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ error: err.message });
+        }
     
 }
 }
