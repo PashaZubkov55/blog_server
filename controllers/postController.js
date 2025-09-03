@@ -63,14 +63,10 @@ async del(req, res, next){
             let fileName =  uuid.v4() +'.jpg'
             img.mv(path.resolve(__dirname, '..', 'static', fileName))
 
-          //let fileImg=  req.files.img|| {}
-           // let files = req.files || {}; // Получаем файлы, либо пустой объект, если их нет
-            //let imgFile = files.img && Array.isArray(files.img) ? files.img[0] : null; // Берём первый файл, если есть
-           // console.log(fileImg)
             if (!img) throw new Error('Файл изображения не передан.');
     
             
-            //console.log(fileImg)
+          
             await img.mv(path.resolve(__dirname, '..', 'static',fileName )); // Сохраняем файл по правильному пути
     
 
