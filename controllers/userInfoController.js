@@ -24,7 +24,13 @@ class InfoUser{
 
    }
       async getInfo(req, res, next){
-         
+         const {userId} = req.params
+         try {
+            const user = await UserInfo.findOne({where: {userId}})
+            return res.json(user)
+         } catch (error) {
+            return  next(ApiError.badRequest(error.massege))
+         }
       }
       
       
