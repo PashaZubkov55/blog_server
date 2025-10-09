@@ -31,7 +31,7 @@ async create (req, res, next){
     }
    
 }
-async getOne(req, res){
+async getOne(req, res, next){
     try{
         const {id} = req.params
         const post = await Post.findOne({where:{id}})
@@ -41,7 +41,7 @@ async getOne(req, res){
     }
  
 }
-async del(req, res){
+async del(req, next, res){
     try{
         const {id} = req.params
         const post = await Post.destroy({where:{id}})
@@ -52,6 +52,16 @@ async del(req, res){
     }
    
 }
+async getUserPosts(req,res,next){
+    try {
+       const {userId} = req.params
+    const userPosts = await Post.findAll({where:{userId}})
+       return res.json(userPosts)
+    } catch (error) {
+       return  next(ApiError.badRequest(error.massege))
+    }
+    
+ }
 
 }
 module.exports = new PostController()
