@@ -38,7 +38,10 @@ class InfoUser{
          try {
             const fileName = uuid.v4()+'jpg'
             img.md(path.resolve(__dirname,'..', 'static', fileName))
-            const user = await UserInfo.update({name, userId, img:fileName})
+            const user = await UserInfo.update(
+               {name, userId, img:fileName},
+               { where: { userId } }
+            )
             return res.json(user)
    
          } catch (error) {
