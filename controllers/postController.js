@@ -6,6 +6,7 @@ const ApiError = require('../errors/apiError')
 
 
 
+
 class PostController{
 async getAll(req, res, next){
     try{
@@ -41,7 +42,7 @@ async getOne(req, res, next){
     }
  
 }
-async del(req, res, next,){
+async del(req, res, next){
     try{
         const {id} = req.params
         const post = await Post.destroy({where:{id}})
