@@ -33,9 +33,10 @@ class InfoUser{
          }
       }
       async update(req,res,next){
-         const {name, userId} = req.body
-         const {img} = req.files
+         
          try {
+            const {name, userId} = req.body
+         const {img} = req.files
             const fileName = uuid.v4()+'jpg'
             img.md(path.resolve(__dirname,'..', 'static', fileName))
             const user = await UserInfo.update(
