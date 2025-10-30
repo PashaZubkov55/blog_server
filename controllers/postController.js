@@ -41,7 +41,7 @@ async getOne(req, res, next){
     }
  
 }
-async del(req, next, res){
+async del(req, res, next,){
     try{
         const {id} = req.params
         const post = await Post.destroy({where:{id}})
