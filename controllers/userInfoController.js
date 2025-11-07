@@ -37,8 +37,8 @@ class InfoUser{
          try {
             const {name, userId} = req.body
          const {img} = req.files
-            const fileName = uuid.v4()+'jpg'
-            img.md(path.resolve(__dirname,'..', 'static', fileName))
+            const fileName = uuid.v4()+'.jpg'
+            img.mv(path.resolve(__dirname,'..', 'static', fileName))
             const user = await UserInfo.update(
                {name, userId, img:fileName},
                { where: { userId } }
