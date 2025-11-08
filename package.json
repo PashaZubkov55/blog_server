@@ -18,10 +18,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-fileupload": "^1.5.1",
-<<<<<<< HEAD
     "multer": "^2.0.2",
-=======
->>>>>>> ff0f9341cb5f637d0f679dc1149bf9222a098757
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.3",
     "pg-hstore": "^2.3.4",
