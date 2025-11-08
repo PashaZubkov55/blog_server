@@ -5,7 +5,8 @@ const Router = require('express')
  router.get('/', postController.getAll)
  router.get('/:id', postController.getOne)
  router.post('/',postController.create)
- router.get('/:userId/userPosts', postController.getUserPosts)
+ router.get('/:UserId')
+ router.put('/:id',postController.update)
  router.delete('/:id', postController.del)
 
 

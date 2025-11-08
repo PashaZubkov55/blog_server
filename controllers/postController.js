@@ -1,7 +1,9 @@
 const uuid = require('uuid')
 const path = require('path') 
+const fs = require('fs')
 const {Post} = require('../models/models')
 const ApiError = require('../errors/apiError')
+
 
 
 
@@ -49,6 +51,22 @@ async del(req, next, res){
 
     } catch(err){
         next(ApiError.badRequest(err.message))
+    }  
+}
+ async update(req, res, next){
+    try {
+        const {id, title, description, userId} = req.body
+        const post  = await Post.findByPk(id)
+        //console.log('картинка',post.img)
+        fs.unlinkSync(path.resolve(__dirname, '..', 'static', post.img))
+        const {img} = req.files
+        const fileName = uuid.v4()+'.jpg'
+        img.mv(path.resolve(__dirname, '..', 'static', fileName))
+        await post.update({title, description, userId, img: fileName})
+
+        return res.json(post)
+    } catch (err) {
+        next(ApiError.badRequest(err.message))
     }
    
 }
@@ -64,4 +82,5 @@ async getUserPosts(req,res,next){
  }
 
 }
+   
 module.exports = new PostController()
