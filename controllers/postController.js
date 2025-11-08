@@ -1,5 +1,6 @@
 const uuid = require('uuid')
 const path = require('path') 
+const fs = require('fs')
 const {Post} = require('../models/models')
 const ApiError = require('../errors/apiError')
 
@@ -50,38 +51,26 @@ async del(req, res, next){
 
     } catch(err){
         next(ApiError.badRequest(err.message))
+    }  
+}
+ async update(req, res, next){
+    try {
+        const {id, title, description, userId} = req.body
+        const post  = await Post.findByPk(id)
+        //console.log('картинка',post.img)
+        fs.unlinkSync(path.resolve(__dirname, '..', 'static', post.img))
+        const {img} = req.files
+        const fileName = uuid.v4()+'.jpg'
+        img.mv(path.resolve(__dirname, '..', 'static', fileName))
+        await post.update({title, description, userId, img: fileName})
+
+        return res.json(post)
+    } catch (err) {
+        next(ApiError.badRequest(err.message))
     }
    
-}
+ }
 
-    async update(req, res) {
-        try {
-            const { id } = req.params;
-            const { title, description, userId } = req.body;
-            const {img} = req.files
-            console.log(img)
-            let fileName =  uuid.v4() +'.jpg'
-            img.mv(path.resolve(__dirname, '..', 'static', fileName))
-
-            if (!img) throw new Error('Файл изображения не передан.');
-    
-            
-          
-            await img.mv(path.resolve(__dirname, '..', 'static',fileName )); // Сохраняем файл по правильному пути
-    
-
-            const updatedPost = await Post.update(
-                { title, description, userId, img: fileName },
-                { where: { id } }
-            );
-    
-            return res.json(updatedPost);
-        } catch (err) {
-            console.log(err);
-            return res.status(500).json({ error: err.message });
-        }
-    
-}
 }
    
 module.exports = new PostController()
