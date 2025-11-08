@@ -1,8 +1,8 @@
 const path = require('path') 
 const uuid = require('uuid')
 const ApiError = require('../errors/apiError')
-const { UserInfo, Post } = require('../models/models')
-const { where } = require('sequelize')
+const { UserInfo} = require('../models/models')
+
 
 class InfoUser{
  
@@ -31,6 +31,24 @@ class InfoUser{
          } catch (error) {
             return  next(ApiError.badRequest(error.massege))
          }
+      }
+      async update(req,res,next){
+         
+         try {
+            const {name, userId} = req.body
+         const {img} = req.files
+            const fileName = uuid.v4()+'.jpg'
+            img.mv(path.resolve(__dirname,'..', 'static', fileName))
+            const user = await UserInfo.update(
+               {name, userId, img:fileName},
+               { where: { userId } }
+            )
+            return res.json(user)
+   
+         } catch (error) {
+            return  next(ApiError.badRequest(error.massege))
+         }
+       
       }
       
       

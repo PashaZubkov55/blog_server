@@ -36,9 +36,9 @@ class UserController{
         let compairePassword = bcrypt.compareSync(password, user.password)
         if (!compairePassword) {
             return next(ApiError.badRequest('Пароль не верный ! '))
-        }
+        }   const id = user.id
             const token = genirateJWT(user.id, user.email, user.role)
-            return res.json({token})
+            return res.json({ id ,token})
 
     }
     async check (){
