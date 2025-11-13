@@ -43,7 +43,7 @@ async getOne(req, res, next){
     }
  
 }
-async del(req, next, res){
+async del(req, res , next){
     try{
         const {id} = req.params
         const post = await Post.destroy({where:{id}})
@@ -73,6 +73,8 @@ async del(req, next, res){
 async getUserPosts(req,res,next){
     try {
        const {userId} = req.params
+       console.log('userId-', userId)
+       
     const userPosts = await Post.findAll({where:{userId}})
        return res.json(userPosts)
     } catch (error) {
