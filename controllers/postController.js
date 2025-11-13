@@ -46,7 +46,9 @@ async getOne(req, res, next){
 async del(req, res , next){
     try{
         const {id} = req.params
-        const post = await Post.destroy({where:{id}})
+        const  post = await Post.findByPk(id)
+        fs.unlinkSync(path.resolve(__dirname, '..', 'static', post.img))
+        await post.destroy({where:{id}})
         return res.json(post)
 
     } catch(err){
