@@ -1,8 +1,11 @@
 const bcrypt = require('bcrypt')
-
-const{User} = require('../models/models')
+const path = require('path')
+const fs = require('fs/promises')
+const{User, Post, UserInfo} = require('../models/models')
 const ApiError = require('../errors/apiError')
 const jwt = require('jsonwebtoken')
+
+
 
 const genirateJWT  = (id, email, role)=>{
   return  jwt.sign(
@@ -44,7 +47,46 @@ class UserController{
     async check (){
         
     }
-    async del(){
+    async del(req, res, next){
+        try {
+            
+            const {id} = req.params
+            Number(id)
+            console.log(`id user- ${id}`)
+            const user = await User.findByPk(id)
+            console.log(`пользователь - ${user}`)
+            const posts  = await Post.findAll({where:{userId:id}})
+            const userInfo = await UserInfo.findOne({where:{userId: id}})
+            console.log(`посты пользователя - ${posts}`)
+            console.log(`информация о пользователе  - ${userInfo}`)
+            const allIMG = []
+            if (posts && userInfo) {
+                 // формируем масив из картиное
+                allIMG.push(
+                    ...posts.filter(post=> post.img).map(post=> post.img),
+                    userInfo? userInfo.img: null
+                ) 
+
+                console.log(`все фотки - ${allIMG}`)
+            
+                // удаляем все  картинки 
+                await Promise.all(allIMG.map(fileName=>{
+                    const filePath = path.resolve(__dirname, '..', 'static', fileName)
+                    return fs.unlink(filePath).catch(()=>{})
+                   
+                }))
+                await user.destroy({where:{id:id}})
+                return res.json(user)
+        }
+            
+             await user.destroy({where:{id:id}})
+            return res.json(user)
+           
+           
+        }
+        catch (error) {
+            return next(ApiError.badRequest('Пользователь не найден! '))
+        }
         
     }
 }

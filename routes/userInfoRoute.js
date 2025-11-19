@@ -7,7 +7,7 @@ const userInfoController = require('../controllers/userInfoController')
  router.get('/:userId',userInfoController.getInfo)
  router.post('/', userInfoController.create)
  router.put('/:userId', userInfoController.update)
- router.delete('/:id', userInfoController.del)
+ router.delete('/:userId', userInfoController.del)
 
 
  module.exports = router
