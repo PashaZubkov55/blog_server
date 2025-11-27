@@ -44,12 +44,12 @@ class UserController{
             return res.json({ id ,token})
 
     }
-    async check (){
-        
+    async check(req, res, next) {
+        const token = genirateJWT(req.user.id, req.user.email, req.user.role)
+        return res.json({token})
     }
     async del(req, res, next){
         try {
-            
             const {id} = req.params
             Number(id)
             console.log(`id user- ${id}`)
