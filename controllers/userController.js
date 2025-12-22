@@ -4,6 +4,7 @@ const fs = require('fs/promises')
 const{User, Post, UserInfo} = require('../models/models')
 const ApiError = require('../errors/apiError')
 const jwt = require('jsonwebtoken')
+const { sendEmail } = require('../utils/sendEmail')
 
 
 
@@ -14,6 +15,12 @@ const genirateJWT  = (id, email, role)=>{
      {expiresIn:'24h'}
     )
 }
+    const resetToken = (id)=>{
+        return jwt.sign(
+            {id}, 
+            process.env.SECRET_KEY_RESET_PASSWORD,
+            {expiresIn:'1h'})
+    }
 class UserController{
     async registration(req,res,next){
         const {email, password, role}  = req.body
@@ -21,7 +28,7 @@ class UserController{
            return next(ApiError.badRequest('Неверный E-mail или пароль !'))   
         }
         const candidate = await User.findOne({where: {email}})
-        if (candidate) {
+        if(candidate) {
             return next(ApiError.badRequest('Пользователь с таким email уже существует'))
         }
         const hashPassword = await bcrypt.hash(password, 5)
@@ -48,6 +55,35 @@ class UserController{
         const token = genirateJWT(req.user.id, req.user.email, req.user.role)
         return res.json({token})
     }
+
+    async forgotPassword(req,res,next){
+        const {email} = req.body
+        try {
+            const user = await User.findOne({where:{email}})
+            if (!user) {
+                return next(ApiError.badRequest('Пользователь не найден'))  
+            }
+            const token = resetToken(user.id)
+            await user.update({
+                resetPasswordToken: token,
+                resetPasswordExpires: Date.now(3600000)
+    
+            })
+            const resetURL = `${process.env.url_client}/restoratonPassword/${token}`
+            await sendEmail(email,'востоновление пароля', `Пожалуйста перейдите по ссылке востоновление пароля ${resetURL}`)
+          
+           return res.json({token})
+        } catch (error) {
+          
+           console.log(error)
+           
+        }
+       
+
+    }
+
+
+
     async del(req, res, next){
         try {
             const {id} = req.params

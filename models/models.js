@@ -1,3 +1,4 @@
+const { type } = require('express/lib/response');
 const sequelize = require('../db')
 const {DataTypes} = require ('sequelize')
 
@@ -6,6 +7,14 @@ const User = sequelize.define('User',{
     email:{type: DataTypes.STRING, unique: true},
     password:{type: DataTypes.STRING},
     role:{type: DataTypes.STRING, defaultValue: 'ADMIN'},
+    resetPasswordToken: { // Добавляем поле для хранения токена восстановления
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      resetPasswordExpires: { // Срок действия токена
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
 
 })
 const UserInfo = sequelize.define('UserInfo',{

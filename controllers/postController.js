@@ -3,6 +3,8 @@ const path = require('path')
 const fs = require('fs')
 const {Post} = require('../models/models')
 const ApiError = require('../errors/apiError')
+const { Op } = require('sequelize')
+
 
 
 
@@ -10,9 +12,17 @@ const ApiError = require('../errors/apiError')
 
 class PostController{
 async getAll(req, res, next){
+    const {title} = req.params
     try{
-    const posts = await Post.findAll()
-    return res.json(posts)
+        if (title) {
+            const posts = await Post.findAll({where:{title:{
+                [Op.iLike]: `%${title}%`
+            }}})
+            return res.json(posts)
+        }
+        const posts = await Post.findAll()
+        return res.json(posts)
+           
     }catch(err){
         next(ApiError.badRequest(err.message))
     }
@@ -43,6 +53,15 @@ async getOne(req, res, next){
     }
  
 }
+    async searchPost(req,res,next){
+        const {title} = req.params
+        try {
+            const post = await Post.findOne({where:{title}})
+             return res.json(post)
+        } catch (error) {
+            next(ApiError.badRequest(err.message))
+        }
+    }
 async del(req, res , next){
     try{
         const {id} = req.params
