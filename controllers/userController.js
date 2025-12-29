@@ -66,13 +66,12 @@ class UserController{
             const token = resetToken(user.id)
             await user.update({
                 resetPasswordToken: token,
-                resetPasswordExpires: Date.now(3600000)
-    
-            })
+                resetPasswordExpires: Date.now() + 3600000, // Токен действует 1 час
+              });
             const resetURL = `${process.env.url_client}/restoratonPassword/${token}`
             await sendEmail(email,'востоновление пароля', `Пожалуйста перейдите по ссылке востоновление пароля ${resetURL}`)
           
-           return res.json({token})
+           return res.json(user)
         } catch (error) {
           
            console.log(error)
@@ -81,6 +80,38 @@ class UserController{
        
 
     }
+    resetPassword = async (req, res, next) => {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+      
+        try {
+          // Декодируем токен и получаем ID пользователя
+          const decodedToken = jwt.verify(token, process.env.SECRET_KEY_RESET_PASSWORD);
+      
+          // Находим пользователя по токену
+          const user = await User.findOne({ where: { resetPasswordToken: token } });
+          if (!user) return next(ApiError.badRequest('Устаревший токен '))
+      
+          // Проверяем срок действия токена
+          if (Date.now() >= user.resetPasswordExpires) return  next(ApiError.badRequest('Срок действия ссылки истек'))
+      
+          // Хешируем новый пароль
+          const saltRounds = 5;
+          const hash = await bcrypt.hash(newPassword, saltRounds);
+      
+          // Обновляем пароль и очищаем токен восстановления
+          await user.update({
+            password: hash,
+            resetPasswordToken: null,
+            resetPasswordExpires: null,
+          });
+      
+          //res.status(200).send('Пароль успешно изменён.');
+          return res.json(user)
+        } catch (err) {
+         return  next(ApiError.badRequest('Ошибка сервера '))
+        }
+      };
 
 
 

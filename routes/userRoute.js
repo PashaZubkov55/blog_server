@@ -8,6 +8,8 @@ const Autthmiddleware = require('../middlewaires/Autthmiddleware')
  router.get('/auth',  Autthmiddleware, userController.check)
  router.delete('/:id',userController.del)
  router.post('/forget-password', userController.forgotPassword)
+ router.put('/reset-password/:token', userController.resetPassword)
+
 
 
  module.exports = router
