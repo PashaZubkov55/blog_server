@@ -38,17 +38,28 @@ class InfoUser{
          try {
             const {name, userId} = req.body
             const userInfo = await UserInfo.findByPk(userId)
+            console.log(userInfo)
+            if (req.files == null) {
+               userInfo.update(
+                  {name, userId, img:userInfo.img},
+                  { where: { userId } }
+               )
+               return res.json(userInfo)
+               
+            }
+          
             fs.unlinkSync(path.resolve(__dirname, '..', 'static', userInfo.img))
-             const {img} = req.files
+            const {img} = req.files
             const fileName = uuid.v4()+'.jpg'
             img.mv(path.resolve(__dirname,'..', 'static', fileName))
             userInfo.update(
                {name, userId, img:fileName},
                { where: { userId } }
             )
-            return res.json(user)
+            return res.json(userInfo)
    
          } catch (error) {
+            console.log(error)
             return  next(ApiError.badRequest(error.massege))
          }
        
