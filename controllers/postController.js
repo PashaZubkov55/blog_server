@@ -76,11 +76,15 @@ async del(req, res , next){
 }
  async update(req, res, next){
     try {
-        const {id, title, description, userId} = req.body
+        const {id, title, description, userId, } = req.body
         const post  = await Post.findByPk(id)
         //console.log('картинка',post.img)
-        fs.unlinkSync(path.resolve(__dirname, '..', 'static', post.img))
+      if (req.files == null) {
+        await post.update({title, description, userId, img: post.img})
+        return res.json(post)
+      }
         const {img} = req.files
+        fs.unlinkSync(path.resolve(__dirname, '..', 'static', post.img))
         const fileName = uuid.v4()+'.jpg'
         img.mv(path.resolve(__dirname, '..', 'static', fileName))
         await post.update({title, description, userId, img: fileName})
@@ -88,6 +92,7 @@ async del(req, res , next){
         return res.json(post)
     } catch (err) {
         next(ApiError.badRequest(err.message))
+        console.log(err)
     }
    
 }

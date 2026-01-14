@@ -109,7 +109,8 @@ class UserController{
           //res.status(200).send('Пароль успешно изменён.');
           return res.json(user)
         } catch (err) {
-         return  next(ApiError.badRequest('Ошибка сервера '))
+         console.log(err)
+            //return  next(ApiError.badRequest('Ошибка сервера '))
         }
       };
 
