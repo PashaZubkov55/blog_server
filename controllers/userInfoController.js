@@ -47,16 +47,26 @@ class InfoUser{
                return res.json(userInfo)
                
             }
-          
-            fs.unlinkSync(path.resolve(__dirname, '..', 'static', userInfo.img))
+            if (userInfo.img !== 'camera.jpg') {
+               fs.unlinkSync(path.resolve(__dirname, '..', 'static', userInfo.img))
+               const {img} = req.files
+               const fileName = uuid.v4()+'.jpg'
+               img.mv(path.resolve(__dirname,'..', 'static', fileName))
+               userInfo.update(
+                  {name, userId, img:fileName},
+                  { where: { userId } }
+               )
+               return res.json(userInfo)
+            }
             const {img} = req.files
-            const fileName = uuid.v4()+'.jpg'
-            img.mv(path.resolve(__dirname,'..', 'static', fileName))
-            userInfo.update(
-               {name, userId, img:fileName},
-               { where: { userId } }
-            )
-            return res.json(userInfo)
+               const fileName = uuid.v4()+'.jpg'
+               img.mv(path.resolve(__dirname,'..', 'static', fileName))
+               userInfo.update(
+                  {name, userId, img:fileName},
+                  { where: { userId } }
+               )
+               return res.json(userInfo)
+           
    
          } catch (error) {
             console.log(error)

@@ -139,8 +139,12 @@ class UserController{
             
                 // удаляем все  картинки 
                 await Promise.all(allIMG.map(fileName=>{
-                    const filePath = path.resolve(__dirname, '..', 'static', fileName)
-                    return fs.unlink(filePath).catch(()=>{})
+                    if (fileName !== 'camera.jpg') {
+                        const filePath = path.resolve(__dirname, '..', 'static', fileName)
+                        return fs.unlink(filePath).catch(()=>{})
+                    }
+                   // const filePath = path.resolve(__dirname, '..', 'static', fileName)
+                  
                    
                 }))
                 await user.destroy({where:{id:id}})
