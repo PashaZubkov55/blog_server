@@ -1,6 +1,8 @@
 const { type } = require('express/lib/response');
 const sequelize = require('../db')
-const {DataTypes} = require ('sequelize')
+const {DataTypes} = require ('sequelize');
+const path = require('path');
+
 
 const User = sequelize.define('User',{
     id:{type: DataTypes.INTEGER, primaryKey:true, autoIncrement:true},
@@ -20,7 +22,7 @@ const User = sequelize.define('User',{
 const UserInfo = sequelize.define('UserInfo',{
     id:{type:DataTypes.INTEGER,  primaryKey: true, autoIncrement:true},
     name:{type:DataTypes.STRING,  allowNull: false},
-    img: {type: DataTypes.STRING, allowNull: false},
+    img: {type: DataTypes.STRING, defaultValue:'camera.jpg',   allowNull: false},
     userId: {type: DataTypes.INTEGER,references: {model: User ,key: 'id'}}
 
 })
