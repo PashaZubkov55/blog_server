@@ -33,7 +33,7 @@ class UserController{
         }
         const hashPassword = await bcrypt.hash(password, 5)
         const user = await User.create({email,role, password: hashPassword})
-
+        const userInfo =  await UserInfo.create({name: user.email, userId: user.id})
         const token = genirateJWT(user.id, user.email, user.role)
         return res.json({token})
     }
@@ -139,8 +139,12 @@ class UserController{
             
                 // удаляем все  картинки 
                 await Promise.all(allIMG.map(fileName=>{
-                    const filePath = path.resolve(__dirname, '..', 'static', fileName)
-                    return fs.unlink(filePath).catch(()=>{})
+                    if (fileName !== 'camera.jpg') {
+                        const filePath = path.resolve(__dirname, '..', 'static', fileName)
+                        return fs.unlink(filePath).catch(()=>{})
+                    }
+                   // const filePath = path.resolve(__dirname, '..', 'static', fileName)
+                  
                    
                 }))
                 await user.destroy({where:{id:id}})
