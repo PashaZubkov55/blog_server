@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
 const path = require('path')
-const fs = require('fs/promises')
+const fs = require('fs').promises
 const{User, Post, UserInfo} = require('../models/models')
 const ApiError = require('../errors/apiError')
 const jwt = require('jsonwebtoken')
@@ -115,7 +115,7 @@ class UserController{
       };
 
 
-
+/*
     async del(req, res, next){
         try {
             const {id} = req.params
@@ -160,7 +160,55 @@ class UserController{
             return next(ApiError.badRequest('Пользователь не найден! '))
         }
         
-    }
+    }*/
+
+        async del(req, res, next) {
+            try {
+                const { id } = req.params;
+                
+                // Проверяем, что передан корректный id
+                if (isNaN(Number(id))) {
+                    return res.status(400).json({ message: 'Некорректный id.' });
+                }
+        
+                // Получаем пользователя по id
+                const user = await User.findByPk(id);
+                if (!user) {
+                    return res.status(404).json({ message: 'Пользователь не найден.' });
+                }
+        
+                // Получаем посты пользователя
+                const posts = await Post.findAll({ where: { userId: id } });
+                const userInfo = await UserInfo.findOne({ where: { userId: id } });
+        
+                // Формируем массив всех изображений
+                const allIMG = [
+                    ...posts.filter((post) => post.img).map((post) => post.img),
+                    userInfo ? userInfo.img : null
+                ].filter(Boolean); // фильтруем null и undefined
+        
+                // Удаляем все изображения
+                await Promise.all(allIMG.map(async (fileName) => {
+                    if (fileName !== 'camera.jpg') {
+                        const filePath = path.resolve(__dirname, '..', 'static', fileName);
+                        try {
+                            await fs.unlink(filePath);
+                        } catch (err) {
+                            console.error(`Ошибка при удалении файла ${fileName}:`, err);
+                        }
+                    }
+                }));
+        
+                // Удаляем пользователя
+                await user.destroy();
+        
+                return res.json({ success: true, message: 'Пользователь успешно удалён!' });
+            } catch (error) {
+                console.error(error);
+                return res.status(500).json({ message: 'Ошибка при удалении пользователя.' });
+            }
+        }
+
 }
 
 module.exports = new UserController()
