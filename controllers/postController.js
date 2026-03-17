@@ -1,6 +1,6 @@
 const uuid = require('uuid')
 const path = require('path') 
-const fs = require('fs')
+const fs = require('fs').promises;
 const {Post} = require('../models/models')
 const ApiError = require('../errors/apiError')
 const { Op } = require('sequelize')
@@ -34,7 +34,6 @@ async create (req, res, next){
         const {img} = req.files
         let fileName = uuid.v4() +'.jpg'
         img.mv(path.resolve(__dirname, '..', 'static', fileName))
-    
         const posts = await Post.create({title, description, userId, img: fileName})
 
         return res.json(posts)
@@ -62,7 +61,7 @@ async getOne(req, res, next){
             next(ApiError.badRequest(err.message))
         }
     }
-async del(req, res , next){
+/*async del(req, res , next){
     try{
         const {id} = req.params
         const  post = await Post.findByPk(id)
@@ -73,8 +72,42 @@ async del(req, res , next){
     } catch(err){
         next(ApiError.badRequest(err.message))
     }  
+}*/
+
+//удаление 
+async  del(req, res, next) {
+    try {
+        const { id } = req.params;
+        const post = await Post.findByPk(id);
+        
+        if (!post) {
+            return res.status(404).send('Пост не найден.');
+        }
+    
+        // Путь к изображению поста
+        const imgPath = path.resolve(__dirname, '..', 'static', post.img);
+
+        // Проверяем существование файла перед удалением
+        try {
+            await fs.access(imgPath); // Проверьте, существует ли файл
+            
+            // Удаление файла асинхронно
+            await fs.unlink(imgPath);
+        } catch (err) {
+            if (err.code !== 'ENOENT') { // Файл отсутствует — это нормально
+                console.error(`Ошибка при удалении файла ${imgPath}:`, err);
+            }
+        }
+
+        // Уничтожаем запись поста
+        await post.destroy();
+
+        return res.json(post);
+    } catch (err) {
+        next(ApiError.badRequest(err.message)); // Передача исключения дальше
+    }
 }
- async update(req, res, next){
+/* async update(req, res, next){
     try {
         const {id, title, description, userId, } = req.body
         const post  = await Post.findByPk(id)
@@ -95,6 +128,54 @@ async del(req, res , next){
         console.log(err)
     }
    
+}
+    */
+
+
+
+async  update(req, res, next) {
+    try {
+        const { id, title, description, userId } = req.body;
+        const post = await Post.findByPk(id);
+
+        if (req.files == null || Object.keys(req.files).length === 0) {
+            await post.update({ title, description, userId });
+            return res.json(post);
+        }
+
+        const { img } = req.files;
+        const oldImgPath = path.resolve(__dirname, '..', 'static', post.img);
+
+        // Генерируем новое уникальное имя файла
+        const newFileName = `${uuid.v4()}.jpg`;
+        const newImgPath = path.resolve(__dirname, '..', 'static', newFileName);
+
+        // Перемещаем загруженный файл
+        await img.mv(newImgPath);
+
+        // Асинхронная проверка и удаление старого файла (если он существует)
+        try {
+            await fs.access(oldImgPath); // Проверяем существование файла
+            await fs.unlink(oldImgPath); // Удаляем старый файл
+        } catch (err) {
+            if (err.code !== 'ENOENT') { // Игнорируем случай отсутствия файла
+                console.error(`Ошибка при удалении файла ${oldImgPath}`, err);
+            }
+        }
+
+        // Обновляем пост новыми данными
+        await post.update({
+            title,
+            description,
+            userId,
+            img: newFileName
+        });
+
+        return res.json(post);
+    } catch (err) {
+        next(ApiError.badRequest(err.message));
+        console.log(err);
+    }
 }
 async getUserPosts(req,res,next){
     try {
