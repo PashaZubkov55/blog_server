@@ -16,15 +16,17 @@ class InfoUser{
             return  next(ApiError.badRequest(error.massege))
          }
       }
-      /*
+
+     
+
+      
       async update(req,res,next){
          
          try {
             const {name, userId} = req.body
             const userInfo = await UserInfo.findByPk(userId)
-            console.log(userInfo)
             if (req.files == null) {
-               userInfo.update(
+              await userInfo.update(
                   {name, userId, img:userInfo.img},
                   { where: { userId } }
                )
@@ -32,11 +34,12 @@ class InfoUser{
                
             }
             if (userInfo.img !== 'camera.jpg') {
-               fs.unlinkSync(path.resolve(__dirname, '..', 'static', userInfo.img))
+               await fs.unlink(path.resolve(__dirname, '..', 'static', userInfo.img))
+            
                const {img} = req.files
                const fileName = uuid.v4()+'.jpg'
-               img.mv(path.resolve(__dirname,'..', 'static', fileName))
-               userInfo.update(
+               await img.mv(path.resolve(__dirname,'..', 'static', fileName))
+             await  userInfo.update(
                   {name, userId, img:fileName},
                   { where: { userId } }
                )
@@ -44,8 +47,8 @@ class InfoUser{
             }
             const {img} = req.files
                const fileName = uuid.v4()+'.jpg'
-               img.mv(path.resolve(__dirname,'..', 'static', fileName))
-               userInfo.update(
+              await img.mv(path.resolve(__dirname,'..', 'static', fileName))
+              await userInfo.update(
                   {name, userId, img:fileName},
                   { where: { userId } }
                )
@@ -58,9 +61,9 @@ class InfoUser{
          }
        
       }
-         */
-    
-
+         
+    /*
+      
       async  update(req, res, next) {
           try {
               const { name, userId } = req.body;
@@ -109,6 +112,7 @@ class InfoUser{
               console.error(err);
           }
       }
+          */
       
       
       async del(){

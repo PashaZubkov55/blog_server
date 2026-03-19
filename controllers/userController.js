@@ -68,7 +68,7 @@ class UserController{
                 resetPasswordToken: token,
                 resetPasswordExpires: Date.now() + 3600000, // Токен действует 1 час
               });
-            const resetURL = `${process.env.URL_CLIENT}/restoratonPassword/${token}`
+            const resetURL = `${process.env.URL_CLIENT}restoratonPassword/${token}`
             await sendEmail(email,'востоновление пароля', `Пожалуйста перейдите по ссылке востоновление пароля ${resetURL}`)
           
            return res.json(user)
